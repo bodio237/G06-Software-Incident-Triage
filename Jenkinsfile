@@ -26,7 +26,7 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                sh '''
+                bat '''
                     python3 -m pip install -r requirements-dev.txt
                     python3 -m pip install --no-deps -e .
                 '''
@@ -35,7 +35,7 @@ pipeline {
 
         stage('Automated tests') {
             steps {
-                sh '''
+                bat '''
                     mkdir -p reports
                     python3 -m pytest --junitxml=reports/pytest.xml
                 '''
@@ -44,7 +44,7 @@ pipeline {
 
         stage('Terraform validate') {
             steps {
-                sh '''
+                bat '''
                     cd infra
                     terraform init -backend=false -input=false
                     terraform validate
@@ -55,7 +55,7 @@ pipeline {
         stage('Prepare immutable image tag') {
             steps {
                 script {
-                    def commit = sh(
+                    def commit = bat(
                         script: 'git rev-parse --short=12 HEAD',
                         returnStdout: true
                     ).trim()
@@ -74,7 +74,7 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                sh '''
+                bat '''
                     docker build -t "${IMAGE_REF}" .
                     docker image inspect "${IMAGE_REF}" > /dev/null
                 '''
@@ -83,7 +83,7 @@ pipeline {
 
         stage('Container smoke test') {
             steps {
-                sh '''
+                bat '''
                     python3 scripts/container_smoke.py "${IMAGE_REF}"
                 '''
             }
