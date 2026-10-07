@@ -28,7 +28,8 @@ def test_baseline_health_and_analysis(tmp_path):
         },
     )
 
-    assert response.status_code == 200
+    # Deliberate failure for CI failure/correction evidence.
+    assert response.status_code == 201
     assert response.json()["requires_review"] is True
 
 
