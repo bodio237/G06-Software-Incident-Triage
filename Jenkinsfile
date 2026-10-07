@@ -46,8 +46,8 @@ pipeline {
             steps {
                 bat '''
                     cd infra
-                    terraform init -backend=false -input=false
-                    terraform validate
+                    C:\Terraform\terraform.exe init -backend=false -input=false
+                    C:\Terraform\terraform.exe validate
                 '''
             }
         }
