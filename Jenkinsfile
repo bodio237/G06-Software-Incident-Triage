@@ -26,28 +26,28 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                bat '''
-                    python -m pip install -r requirements-dev.txt
-                    python -m pip install --no-deps -e .
+                sh '''
+                    python3 -m pip install -r requirements-dev.txt
+                    python3 -m pip install --no-deps -e .
                 '''
             }
         }
 
         stage('Automated tests') {
             steps {
-                bat '''
+                sh '''
                     mkdir -p reports
-                    python -m pytest --junitxml=reports/pytest.xml
+                    python3 -m pytest --junitxml=reports/pytest.xml
                 '''
             }
         }
 
         stage('Terraform validate') {
             steps {
-                bat '''
+                sh '''
                     cd infra
-                   "C:/Users/GLC/Downloads/Terraform/terraform.exe" init -backend=false -input=false
-                   "C:/Users/GLC/Downloads/Terraform/terraform.exe" validate
+                    terraform init -backend=false -input=false
+                    terraform validate
                 '''
             }
         }
@@ -55,7 +55,7 @@ pipeline {
         stage('Prepare immutable image tag') {
             steps {
                 script {
-                    def commit = bat(
+                    def commit = sh(
                         script: 'git rev-parse --short=12 HEAD',
                         returnStdout: true
                     ).trim()
@@ -74,7 +74,7 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                bat '''
+                sh '''
                     docker build -t "${IMAGE_REF}" .
                     docker image inspect "${IMAGE_REF}" > /dev/null
                 '''
@@ -83,9 +83,8 @@ pipeline {
 
         stage('Container smoke test') {
             steps {
-                bat '''
-                    python -m pip install -r requirements-dev.txt
-                    python -m pip install --no-deps -e .
+                sh '''
+                    python3 scripts/container_smoke.py "${IMAGE_REF}"
                 '''
             }
         }
