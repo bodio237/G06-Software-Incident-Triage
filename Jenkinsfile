@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'ai-lab' }
+    agent any
 
     options {
         skipDefaultCheckout(true)
@@ -17,7 +17,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -26,25 +25,25 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                sh '''
-                    python3 -m pip install -r requirements-dev.txt
-                    python3 -m pip install --no-deps -e .
+                bat '''
+                    python -m pip install -r requirements-dev.txt
+                    python -m pip install --no-deps -e .
                 '''
             }
         }
 
         stage('Automated tests') {
             steps {
-                sh '''
-                    mkdir -p reports
-                    python3 -m pytest --junitxml=reports/pytest.xml
+                bat '''
+                    if not exist reports mkdir reports
+                    python -m pytest --junitxml=reports/pytest.xml
                 '''
             }
         }
 
         stage('Terraform validate') {
             steps {
-                sh '''
+                bat '''
                     cd infra
                     terraform init -backend=false -input=false
                     terraform validate
@@ -55,12 +54,13 @@ pipeline {
         stage('Prepare immutable image tag') {
             steps {
                 script {
-                    def commit = sh(
+                    def commit = bat(
                         script: 'git rev-parse --short=12 HEAD',
                         returnStdout: true
                     ).trim()
 
-                    env.IMAGE_REF = "${env.IMAGE_NAME}:g06-${env.BUILD_NUMBER}-${commit}"
+                    env.IMAGE_REF =
+                        "${env.IMAGE_NAME}:g06-${env.BUILD_NUMBER}-${commit}"
 
                     writeFile(
                         file: 'image-tag.txt',
@@ -74,17 +74,17 @@ pipeline {
 
         stage('Build Docker image') {
             steps {
-                sh '''
-                    docker build -t "${IMAGE_REF}" .
-                    docker image inspect "${IMAGE_REF}" > /dev/null
+                bat '''
+                    docker build -t "%IMAGE_REF%" .
+                    docker image inspect "%IMAGE_REF%" > NUL
                 '''
             }
         }
 
         stage('Container smoke test') {
             steps {
-                sh '''
-                    python3 scripts/container_smoke.py "${IMAGE_REF}"
+                bat '''
+                    python scripts/container_smoke.py "%IMAGE_REF%"
                 '''
             }
         }
