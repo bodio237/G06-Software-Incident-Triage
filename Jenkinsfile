@@ -27,8 +27,8 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 bat '''
-                    python3 -m pip install -r requirements-dev.txt
-                    python3 -m pip install --no-deps -e .
+                    python -m pip install -r requirements-dev.txt
+                    python -m pip install --no-deps -e .
                 '''
             }
         }
@@ -37,7 +37,7 @@ pipeline {
             steps {
                 bat '''
                     mkdir -p reports
-                    python3 -m pytest --junitxml=reports/pytest.xml
+                    python -m pytest --junitxml=reports/pytest.xml
                 '''
             }
         }
@@ -84,7 +84,8 @@ pipeline {
         stage('Container smoke test') {
             steps {
                 bat '''
-                    python3 scripts/container_smoke.py "${IMAGE_REF}"
+                    python -m pip install -r requirements-dev.txt
+                    python -m pip install --no-deps -e .
                 '''
             }
         }
