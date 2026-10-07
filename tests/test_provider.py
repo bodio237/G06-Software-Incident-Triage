@@ -116,6 +116,26 @@ def test_local_provider_unavailable():
         pass
 
 
+def test_local_provider_timeout():
+    def handler(request):
+        raise httpx.ReadTimeout("Model inference timed out")
+
+    transport = httpx.MockTransport(handler)
+
+    provider = LocalAnalysisProvider(
+        base_url="http://fake",
+        model="fake-model",
+        timeout=1,
+        transport=transport,
+    )
+
+    try:
+        provider.analyze(make_request(), make_policy())
+        assert False, "ProviderUnavailable was not raised"
+    except ProviderUnavailable:
+        pass
+
+
 def test_local_provider_unknown_category():
     def handler(request):
         return httpx.Response(
