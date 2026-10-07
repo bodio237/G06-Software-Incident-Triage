@@ -11,6 +11,7 @@ from pathlib import Path
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 FIXTURES_PATH = Path("../01-group-projects/group-06/fixtures.json")
+REQUEST_TIMEOUT = 100
 
 
 def call_api(fixture):
@@ -31,8 +32,13 @@ def call_api(fixture):
     start = time.perf_counter()
 
     try:
-        with urllib.request.urlopen(request, timeout=75) as response:
-            elapsed_ms = round((time.perf_counter() - start) * 1000)
+        with urllib.request.urlopen(
+            request,
+            timeout=REQUEST_TIMEOUT,
+        ) as response:
+            elapsed_ms = round(
+                (time.perf_counter() - start) * 1000
+            )
             body = json.load(response)
 
         return {
@@ -42,7 +48,9 @@ def call_api(fixture):
         }
 
     except (urllib.error.URLError, TimeoutError) as exc:
-        elapsed_ms = round((time.perf_counter() - start) * 1000)
+        elapsed_ms = round(
+            (time.perf_counter() - start) * 1000
+        )
 
         return {
             "success": False,
@@ -56,16 +64,21 @@ def main():
         print(f"ERROR: fixtures file not found: {FIXTURES_PATH}")
         sys.exit(1)
 
-    fixtures = json.loads(FIXTURES_PATH.read_text(encoding="utf-8"))
+    fixtures = json.loads(
+        FIXTURES_PATH.read_text(encoding="utf-8")
+    )
 
     if len(fixtures) != 6:
-        print(f"ERROR: expected 6 fixtures, found {len(fixtures)}")
+        print(
+            f"ERROR: expected 6 fixtures, found {len(fixtures)}"
+        )
         sys.exit(1)
 
     print("G06 Software Incident Triage - Fixture Evaluation")
     print("=" * 60)
     print(f"API: {API_URL}")
     print(f"Fixtures: {FIXTURES_PATH}")
+    print(f"Request timeout: {REQUEST_TIMEOUT} seconds")
     print()
 
     results = []
@@ -104,12 +117,23 @@ def main():
 
         valid_response = all(
             key in analysis
-            for key in ["summary", "category", "priority", "next_action"]
+            for key in [
+                "summary",
+                "category",
+                "priority",
+                "next_action",
+            ]
         )
 
-        category_match = actual_category == fixture["expected_category"]
-        priority_match = actual_priority == fixture["expected_priority"]
-        review_required = response.get("requires_review") is True
+        category_match = (
+            actual_category == fixture["expected_category"]
+        )
+        priority_match = (
+            actual_priority == fixture["expected_priority"]
+        )
+        review_required = (
+            response.get("requires_review") is True
+        )
 
         case_ok = (
             valid_response
@@ -118,14 +142,21 @@ def main():
             and review_required
         )
 
-        print(f"  Expected category: {fixture['expected_category']}")
+        print(
+            f"  Expected category: {fixture['expected_category']}"
+        )
         print(f"  Actual category:   {actual_category}")
-        print(f"  Expected priority: {fixture['expected_priority']}")
+        print(
+            f"  Expected priority: {fixture['expected_priority']}"
+        )
         print(f"  Actual priority:   {actual_priority}")
         print(f"  Latency:           {result['elapsed_ms']} ms")
         print(f"  Valid response:    {valid_response}")
         print(f"  Review required:   {review_required}")
-        print(f"  Result:            {'PASS' if case_ok else 'FAIL'}")
+        print(
+            f"  Result:            "
+            f"{'PASS' if case_ok else 'FAIL'}"
+        )
         print()
 
         if not case_ok:
@@ -153,12 +184,14 @@ def main():
     )
 
     category_matches = sum(
-        1 for result in results
+        1
+        for result in results
         if result.get("category_match") is True
     )
 
     priority_matches = sum(
-        1 for result in results
+        1
+        for result in results
         if result.get("priority_match") is True
     )
 
@@ -178,9 +211,13 @@ def main():
 
     if successful_latencies:
         average_latency = round(
-            sum(successful_latencies) / len(successful_latencies)
+            sum(successful_latencies)
+            / len(successful_latencies)
         )
-        print(f"Average latency:          {average_latency} ms")
+        print(
+            f"Average latency:          "
+            f"{average_latency} ms"
+        )
 
     print(f"Failures/mismatches:      {failures}")
 
