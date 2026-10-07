@@ -46,8 +46,8 @@ pipeline {
             steps {
                 bat '''
                     cd infra
-                    C:/Terraform/terraform.exe init -backend=false -input=false
-                    C:/Terraform/terraform.exe validate
+                   "C:/Users/GLC/Downloads/Terraform/terraform.exe" init -backend=false -input=false
+                   "C:/Users/GLC/Downloads/Terraform/terraform.exe" validate
                 '''
             }
         }
