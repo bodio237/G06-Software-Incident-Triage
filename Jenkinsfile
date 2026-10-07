@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'ai-lab' }
+    agent any
 
     options {
         skipDefaultCheckout(true)
