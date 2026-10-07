@@ -91,3 +91,25 @@ def test_extra_fields_are_rejected(tmp_path):
     )
 
     assert response.status_code == 422
+
+
+def test_original_and_adversarial_cases_require_review(tmp_path):
+    client = create_test_client(tmp_path)
+
+    cases = json.loads(
+        Path("tests/scenario_cases.json").read_text()
+    )
+
+    for case in cases:
+        response = client.post(
+            "/api/analyze",
+            json={
+                "subject": case["subject"],
+                "text": case["text"],
+            },
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["requires_review"] is case["requires_review"]
