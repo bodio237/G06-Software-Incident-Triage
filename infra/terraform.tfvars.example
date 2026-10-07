@@ -1,0 +1,7 @@
+group_id      = 6
+image_name    = "g06-software-incident-triage:local"
+docker_host   = "npipe:////./pipe/docker_engine"
+llm_base_url  = "http://host.docker.internal:1234/v1"
+llm_model     = "google/gemma-4-e4b"
+llm_timeout   = 90
+llm_max_tokens = 300

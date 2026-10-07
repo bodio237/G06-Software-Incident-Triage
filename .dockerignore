@@ -1,0 +1,17 @@
+.env
+.env.*
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.db-*
+reports/
+secrets/
+tests/
+.git/
+.gitignore
+infra/.terraform/
+infra/*.tfstate*
+infra/*.tfplan
+infra/terraform.tfvars

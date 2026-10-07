@@ -1,0 +1,36 @@
+{
+  "id": "g06",
+  "title": "Software Incident Triage",
+  "categories": [
+    "availability",
+    "performance",
+    "release"
+  ],
+  "keywords": {
+    "availability": [
+      "unavailable",
+      "outage",
+      "down",
+      "service unavailable"
+    ],
+    "performance": [
+      "slow",
+      "latency",
+      "performance",
+      "timeout"
+    ],
+    "release": [
+      "release",
+      "deployment",
+      "deploy",
+      "rollback"
+    ]
+  },
+  "high_priority_words": [
+    "urgent",
+    "critical",
+    "immediately",
+    "outage"
+  ],
+  "instructions": "Classify the software incident into exactly one allowed category. Use availability for service outages or unavailable services, performance for slowness, latency or degraded response times, and release for release or deployment problems. Priority rules are strict: use high only when the request explicitly indicates urgency, criticality, immediate action, or an outage. For every request that does not explicitly indicate high priority, use medium by default. Use low only when the request clearly indicates a minor, informational, or non-urgent issue and there is a strong reason not to use medium. Never use low merely because the request is not urgent. Summarize the request and propose a safe next action for a human reviewer. Never claim that a production action, rollback or fix has been performed. If the request is ambiguous, keep requires_review true and do not invent external facts."
+}
